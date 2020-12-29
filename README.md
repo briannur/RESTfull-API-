@@ -7,56 +7,237 @@
 <a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
 </p>
 
-## About Laravel
+# RESTfull-API-
+Repository ini digunakan untuk menyelesaikan tugas Restful API (PHP dan Database) mata kuliah Desain dan Pemrograman WEB 
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+## Tools:
+1. Xampp
+2. Composer
+3. Laravel
+4. Kode editor
+5. Postman ataupun aplikasi SOAP dan REST lainnya
+## Membuat project baru menggunakan laravel
+Untuk membuat project baru, buka command prompt lalu arahkan ke direktori xampp/htdocs/[namafolder]. Setelah itu, ketikan kode berikut:
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+```composer create-project –prefer-dist Laravel/Laravel [nama_direktori_project]```
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+atau
 
-## Learning Laravel
+```composer create-project --prefer-dist laravel/laravel:^7.0 [namaproject]```
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+## Membuat database baru
+Aktifkan xampp terlebih dahulu, kemudian buat database baru anda.
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains over 1500 video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+## Atur database
+Buka folder projek Laravel anda, lalu terdapat file dengan nama .env, buka file .env menggunakan kode editor kemudian edit sesuai database yang sudah dibuat:
 
-## Laravel Sponsors
+```DB_DATABASE = 'db_akademik'```
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the Laravel [Patreon page](https://patreon.com/taylorotwell).
+## Membuat file migrasi
+Buka command prompt, lalu ketikkan kode berikut:
 
-### Premium Partners
+php artisan make:migration create_mahasiswa
 
-- **[Vehikl](https://vehikl.com/)**
-- **[Tighten Co.](https://tighten.co)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Cubet Techno Labs](https://cubettech.com)**
-- **[Cyber-Duck](https://cyber-duck.co.uk)**
-- **[Many](https://www.many.co.uk)**
-- **[Webdock, Fast VPS Hosting](https://www.webdock.io/en)**
-- **[DevSquad](https://devsquad.com)**
-- **[Curotec](https://www.curotec.com/)**
-- **[OP.GG](https://op.gg)**
+Jika sudah, buka project anda lalu buka folder database -> migration -> buka file yang baru saja dibuat. Lalu edit seperti berikut:
 
-## Contributing
+```
+<?php
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
 
-## Code of Conduct
+class CreateMahasiswaTable extends Migration
+{
+    /**
+     * Run the migrations.
+     *
+     * @return void
+     */
+    public function up()
+    {
+        Schema::create('mahasiswa', function (Blueprint $table) {
+            $table->bigIncrements('NIM');
+            $table->string('nama');
+            $table->char('gender');
+            $table->string('ttl');
+            $table->string('prodi');
+        });
+    }
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+    /**
+     * Reverse the migrations.
+     *
+     * @return void
+     */
+    public function down()
+    {
+        Schema::dropIfExists('mahasiswa');
+    }
+}
+```
 
-## Security Vulnerabilities
+Kemudian kembali ke command prompt dan ketik kode berikut:
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+```php artisan migrate```
 
-## License
+Jika berhasil maka database mahasiswa akan terupdate sesuai dengan yang sudah dibuat.
+## Membuat Controller
+Sebagai contoh, untuk membuat controller ketik kode berikut pada command prompt:
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+```php artisan make:controller apicontroller```
+
+File controller dapat di akses dengan membuka folder app -> Http -> Controllers
+## Membuat model
+Contoh pembuatan model, ketik kode berikut pada command prompt:
+
+
+```php artisan make:model MahasiswaModel```
+
+File controller dapat di akses dengan membuka folder app.
+Jika sudah, buka file model yang baru dibuat lalu edit seperti berikut:
+
+```
+<?php
+
+namespace App\Models;
+
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
+
+class MahasiswaModel extends Model
+{
+    protected $table = 'mahasiswa';
+
+    protected $primaryKey = 'NIM';
+}
+
+```
+
+## Membuat Restfull API
+### 1. GET
+Buka file apicontroller, kemudian tambahkan kode berikut agar dapat mengakses model:
+
+```
+<?php
+
+namespace App\Http\Controllers;
+
+use Illuminate\Http\Request;
+use App\Models\MahasiswaModel;
+```
+
+Selanjutnya, buat method function untuk mengambil data dari database. Ketik kode berikut:
+
+```
+public function get_data(){
+  return response()->json(MahasiswaModel::all(),200);
+}
+```
+
+Kemudian buat url. Buka folder routes -> api.php lalu tambahkan kode berikut:
+
+```Route::get('mahasiswa', 'App\Http\Controllers\apicontroller@get_all_mahasiswa');```
+
+Jalankan local server Laravel dengan mengetikkan kode berikut:
+
+```php artisan serve```
+
+Jika sudah buka browser dan arahkan menuju url localserver tersebut ditambah dengan url dari route yaitu /api dan tambahkan route yang kalian buat. Contohnya seperti ini:
+
+```127.0.0.1:8000/api/mahasiswa```
+
+Jika berhasil maka akan muncul data array yang berhasil diakses dari database.
+### 2. POST
+Buat function pada apicontroller untuk melakukan action post. Berikut kodenya:
+
+```
+public function insert_new_mahasiswa(Request $request){
+        $insert_mahasiswa = new MahasiswaModel;
+        $insert_mahasiswa->nama = $request->Nama_Mahasiswa;
+        $insert_mahasiswa->gender = $request->Jenis_Kelamin;
+        $insert_mahasiswa->ttl = $request->Tempat_Tanggal_Lahir;
+        $insert_mahasiswa->prodi = $request->Program_Studi;
+        $insert_mahasiswa->save();
+        return response([
+            'status' => 'SUCCESS',
+            'message' => 'Data mahasiswa ditambahkan',
+            'data' => $insert_mahasiswa
+        ], 200);
+    }
+ ```
+
+Kemudian tambahkan url. Buka folder routes -> api.php dan tambahkan kode berikut:
+
+```Route::post('mahasiswa/new_mahasiswa', 'App\Http\Controllers\apicontroller@insert_new_mahasiswa');```
+
+Terakhir, untuk menguji fungsi tersebut, kita perlu menggunakan Postman.
+Buka postman, lalu pilih method POST dan masukkan url anda, seperti berikut:
+
+http://127.0.0.1:8000/api/mahasiswa/new_mahasiswa
+
+### 3. PUT
+Buat function pada apicontroller untuk melakukan action put. Berikut kodenya:
+
+```
+public function update_data_mahasiswa(Request $request, $id){
+        $checktb = MahasiswaModel::firstWhere('NIM', $nim);
+        if($checktb){
+            $data_mahasiswa = MahasiswaModel::find($nim);
+            $data_mahasiswa->nama = $request->Nama_Mahasiswa;
+            $data_mahasiswa->gender = $request->Jenis_Kelamin;
+            $data_mahasiswa->ttl = $request->Tempat_Tanggal_Lahir;
+            $data_mahasiswa->prodi = $request->Program_Studi;
+            $data_mahasiswa->save();
+            return response([
+                'status' => 'SUCCESS',
+                'message' => 'Data mahasiswa diperbaharui',
+                'update-data' => $data_mahasiswa
+            ], 200);
+        } else {
+            return response([
+                'status' => 'ERROR',
+                'message' => 'Data mahasiswa tidak ditemukan'
+            ], 404);
+        }
+    }
+```
+  
+Kemudian tambahkan url. Buka folder routes -> api.php dan tambahkan kode berikut:
+
+```Route::put('mahasiswa/update/{NIM}', 'App\Http\Controllers\apicontroller@update_data_mahasiswa');```
+
+Terakhir, untuk menguji fungsi tersebut, kita perlu menggunakan Postman.
+Buka postman, lalu pilih method PUT dan masukkan url anda, seperti contoh berikut akan mengupdate kode nim nomor 8:
+
+http://127.0.0.1:8000/api/mahasiswa/update/8
+
+### 4. DELETE
+Buat function pada apicontroller untuk melakukan action put. Berikut kodenya:
+
+```
+public function delete_data_mahasiswa($nim){
+        $checktb = MahasiswaModel::firstWhere('NIM', $nim);
+        if($checktb){
+            MahasiswaModel::destroy($nim);
+            return response([
+                'status' => 'SUCCESS',
+                'message' => 'Data mahasiswa dihapus'
+            ], 200);
+        } else {
+            return response([
+                'status' => 'ERROR',
+                'message' => 'Data mahasiswa tidak ditemukan'
+            ], 404);
+        }
+    }
+```
+  
+Kemudian tambahkan url. Buka folder routes -> api.php dan tambahkan kode berikut:
+
+```Route::delete('mahasiswa/delete/{NIM}', 'App\Http\Controllers\apicontroller@delete_data_mahasiswa');```
+
+Terakhir, untuk menguji fungsi tersebut, kita perlu menggunakan Postman.
+Buka postman, lalu pilih method DELETE dan masukkan url anda, seperti contoh berikut akan menghapusb kode nim nomor 8:
+
+http://127.0.0.1:8000/api/mahasiswa/delete/8
